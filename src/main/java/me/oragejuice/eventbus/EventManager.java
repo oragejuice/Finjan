@@ -6,11 +6,29 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+
 public class EventManager {
 
     private final HashMap<Class<?>, ArrayList<AbstractListener>> listenerMap = new HashMap<>();
     private final HashMap<Object, ArrayList<AbstractListener>> parentMap = new HashMap<>();
-    private final ASMListenerFactory listenerFactory = new ASMListenerFactory();
+    private final ASMListenerFactory listenerFactory;
+
+    public EventManager() {
+        try {
+            this.listenerFactory = new ASMListenerFactory();
+        } catch (InvalidFactoryName e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public EventManager(String name) {
+        try {
+            this.listenerFactory = new ASMListenerFactory(name);
+        } catch (InvalidFactoryName e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
     public void post(Object event) {
         final ArrayList<AbstractListener> listenerList = listenerMap.get(event.getClass());
@@ -27,6 +45,8 @@ public class EventManager {
                 registerListener(obj, method, method.getAnnotation(EventHandler.class).value());
             }
         }
+
+
     }
 
     private void registerListener(Object object, Method method, int priority) {

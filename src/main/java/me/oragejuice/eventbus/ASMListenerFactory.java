@@ -1,8 +1,8 @@
 package me.oragejuice.eventbus;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 import org.objectweb.asm.Type;
 import org.objectweb.asm.ClassWriter;
@@ -16,19 +16,22 @@ public class ASMListenerFactory {
     private ConcurrentHashMap<Method, ASMListener> listenerCache = new ConcurrentHashMap();
     private static String interfaceName = Type.getInternalName(EventInvoker.class);
     private static EventClassLoader classLoader = new EventClassLoader(ASMListenerFactory.class.getClassLoader());
+    private static ArrayList<String> factoryIds = new ArrayList<>();
     private int invokerId;
 
-    public ASMListenerFactory(String factoryId) {
-        this.factoryId = factoryId;
+    public ASMListenerFactory(String factoryId) throws InvalidFactoryName {
 
+        if (factoryIds.contains(factoryId)) {
+            throw new InvalidFactoryName();
+        }
+        this.factoryId = factoryId;
+        factoryIds.add(factoryId);
     }
 
-    public ASMListenerFactory() {
+    public ASMListenerFactory() throws InvalidFactoryName {
         this(String.valueOf(factoryUID));
         factoryUID++;
     }
-
-
 
 
     private ASMListener createInvoker(Method method, Object owner) {

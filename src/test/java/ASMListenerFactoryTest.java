@@ -1,15 +1,23 @@
 import me.oragejuice.eventbus.ASMListener;
 import me.oragejuice.eventbus.ASMListenerFactory;
+import me.oragejuice.eventbus.InvalidFactoryName;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 public class ASMListenerFactoryTest {
 
-    ASMListenerFactory factory = new ASMListenerFactory("a");
+    ASMListenerFactory factory;
+
+    {
+        try {
+            factory = new ASMListenerFactory("a");
+        } catch (InvalidFactoryName e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Test
     @DisplayName("creation and calling")
